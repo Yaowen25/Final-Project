@@ -2,131 +2,143 @@
 #include <fstream>
 #include <string>
 #include <ctime>
-using namespace std;
 
+using namespace std;
 string getTimestamp() {
-    time_t now = time(0);
-    tm ltm;
-    localtime_s(&ltm, &now);
-    char buf[64];
-    strftime(buf, sizeof(buf), "%Y-%m-%d %H:%M:%S", &ltm);
-    return string(buf);
+time_t now = time(0);
+tm ltm;
+localtime_s(&ltm, &now);
+char buf[64];
+strftime(buf, sizeof(buf), "%Y-%m-%d %H:%M:%S", &ltm);
+return string(buf);
 }
 void registerUser() {
-    string username, password;
-    cout << "Create a username: ";
-    cin >> username;
-    cout << "Create a password: ";
-    cin >> password;
-    ofstream file("users.txt", ios::app);
-    file << username << " " << password << endl;
-    file.close();
-    cout << "Account created!\n";
+string username, password;
+cout << "Choose a username: ";
+cin >> username;
+cout << "Choose a password: ";
+cin >> password;
+ofstream file("users.txt", ios::app);
+file << username << " " << password << endl;
+file.close();
+cout << "Account created successfully!\n";
 }
 bool loginUser(string& username) {
-    string inputUser, inputPass;
-    cout << "Username: ";
-    cin >> inputUser;
-    cout << "Password: ";
-    cin >> inputPass;
-
-    ifstream file("users.txt");
-    string user, pass;
-    while (file >> user >> pass) {
-        if (user == inputUser && pass == inputPass) {
-            username = user;
-            return true;
-        }
-    }
-    cout << "Login failed.\n";
-    return false;
+string inputUser, inputPass;
+cout << "Username: ";
+cin >> inputUser;
+cout << "Password: ";
+cin >> inputPass;
+ifstream file("users.txt");
+string user, pass;
+while (file >> user >> pass) {
+if (user == inputUser && pass == inputPass) {
+username = user;
+return true;
+}
+}
+cout << "Login failed. Username or password incorrect.\n";
+return false;
 }
 float loadBalance(const string& filename) {
-    ifstream file(filename);
-    string line;
-    float balance = 500.0;
-
-    while (getline(file, line)) {
-        size_t pos = line.find("$");
-        if (pos != string::npos) {
-            float amount = stof(line.substr(pos + 1));
-            if (line.find("Deposit") != string::npos)
-                balance += amount;
-            else if (line.find("Withdrawal") != string::npos)
-                balance -= amount;
-        }
-    }
-    file.close();
-    return balance;
+ifstream file(filename);
+string line;
+float balance = 500.0;
+while (getline(file, line)) {
+size_t pos = line.find("$");
+if (pos != string::npos) {
+float amount = stof(line.substr(pos + 1));
+if (line.find("Deposit") != string::npos)
+balance += amount;
+else if (line.find("Withdrawal") != string::npos)
+balance -= amount;
+}
+}
+file.close();
+return balance;
 }
 void writeTransaction(const string& filename, const string& type, float amount) {
-    ofstream file(filename, ios::app);
-    file << type << " of $" << amount << " at " << getTimestamp() << endl;
-    file.close();
+ofstream file(filename, ios::app);
+file << type << " of $" << amount << " at " << getTimestamp() << endl;
+file.close();
+}
+void showAllTransactions(const string& filename) {
+ifstream file(filename);
+string line;
+cout << "\n--- All Transactions ---\n";
+while (getline(file, line)) {
+cout << line << endl;
+}
+file.close();
 }
 int main() {
-    int choice;
-    string username;
-    cout << "Welcome to Final Bank Project\n";
-    cout << "[1] Register  [2] Login\n";
-    cout << "Select: ";
-    cin >> choice;
-    if (choice == 1) {
-        registerUser();
-        return 0;
-    }
-    else if (choice == 2) {
-        if (!loginUser(username)) return 0;
-    }
-    else {
-        cout << "Invalid choice.\n";
-        return 0;
-    }
-    string filename = "transactions_" + username + ".txt";
-    float balance = loadBalance(filename);
-    float amount;
-    int option;
-    do {
-        cout << "\n=== Menu ===\n";
-        cout << "1. Check Balance\n";
-        cout << "2. Deposit\n";
-        cout << "3. Withdraw\n";
-        cout << "4. Exit\n";
-        cout << "Choose: ";
-        cin >> option;
-        if (option == 1) {
-            cout << "Current balance: $" << balance << endl;
-        }
-        else if (option == 2) {
-            cout << "Enter deposit amount: $";
-            cin >> amount;
-            if (amount > 0) {
-                balance += amount;
-                writeTransaction(filename, "Deposit", amount);
-                cout << "Deposit successful.\n";
-            }
-            else {
-                cout << "Invalid amount.\n";
-            }
-        }
-        else if (option == 3) {
-            cout << "Enter withdrawal amount: $";
-            cin >> amount;
-            if (amount > 0 && amount <= balance) {
-                balance -= amount;
-                writeTransaction(filename, "Withdrawal", amount);
-                cout << "Withdrawal successful.\n";
-            }
-            else {
-                cout << "Insufficient balance or invalid input.\n";
-            }
-        }
-        else if (option == 4) {
-            cout << "Goodbye. Final balance: $" << balance << endl;
-        }
-        else {
-            cout << "Invalid option.\n";
-        }
-    } while (option != 4);
+int authChoice;
+string username;
+cout << "Welcome to Final Bank System\n";
+cout << "[1] Register  [2] Login\n";
+cout << "Select: ";
+cin >> authChoice;
+if (authChoice == 1) {
+registerUser();
+return 0;
+}
+else if (authChoice == 2) {
+if (!loginUser(username)) return 0;
+}
+else {
+cout << "Invalid choice.\n";
+return 0;
+}
+string filename = "transactions_" + username + ".txt";
+float balance = loadBalance(filename);
+int choice;
+float amount;
+do {
+cout << "\n========= MENU =========\n"
+<< "1) Check Balance\n"
+<< "2) Deposit\n"
+<< "3) Withdrawal\n"
+<< "4) All Transactions\n"
+<< "5) Quit\n"
+<< "Select an option: ";
+cin >> choice;
+switch (choice) {
+case 1:
+cout << "Current balance: $" << balance << endl;
+break;
+case 2:
+cout << "Enter deposit amount: $";
+cin >> amount;
+if (amount > 0) {
+balance += amount;
+writeTransaction(filename, "Deposit", amount);
+cout << "Deposit successful. New balance: $" << balance << endl;
+}
+else {
+cout << "Invalid deposit amount.\n";
+}
+break;
+case 3:
+cout << "Enter withdrawal amount: $";
+cin >> amount;
+if (amount > 0 && amount <= balance) {
+balance -= amount;
+writeTransaction(filename, "Withdrawal", amount);
+cout << "Withdrawal successful. New balance: $" << balance << endl;
+}
+else {
+cout << "Invalid withdrawal amount.\n";
+}
+break;
+case 4:
+showAllTransactions(filename);
+break;
+case 5:
+cout << "Exiting program. Final balance: $" << balance << endl;
+break;
+default:
+cout << "Invalid option.\n";
+}
+} while (choice != 5);
     return 0;
 }
