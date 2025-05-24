@@ -5,14 +5,14 @@
 
 using namespace std;
 string getTimestamp() {
-time_t now = time(0);
+time_t now = time(0); //current time
 tm ltm;
 localtime_s(&ltm, &now);
-char buf[64];
+char buf[64]; // store formatted time
 strftime(buf, sizeof(buf), "%Y-%m-%d %H:%M:%S", &ltm);
 return string(buf);
 }
-void registerUser() {
+void registerUser() { // for a new user to save their username and password
 string username, password;
 cout << "Choose a username: ";
 cin >> username;
@@ -23,7 +23,7 @@ file << username << " " << password << endl;
 file.close();
 cout << "Account created successfully!\n";
 }
-bool loginUser(string& username) {
+bool loginUser(string& username) { // login an existing user 
 string inputUser, inputPass;
 cout << "Username: ";
 cin >> inputUser;
@@ -40,7 +40,7 @@ return true;
 cout << "Login failed. Username or password incorrect.\n";
 return false;
 }
-float loadBalance(const string& filename) {
+float loadBalance(const string& filename) { // show the current acount blance 
 ifstream file(filename);
 string line;
 float balance = 500.0;
@@ -57,21 +57,21 @@ balance -= amount;
 file.close();
 return balance;
 }
-void writeTransaction(const string& filename, const string& type, float amount) {
+void writeTransaction(const string& filename, const string& type, float amount) { // deposit or withdrawal transcation
 ofstream file(filename, ios::app);
 file << type << " of $" << amount << " at " << getTimestamp() << endl;
 file.close();
 }
-void showAllTransactions(const string& filename) {
+void showAllTransactions(const string& filename) { // dispalce all transaction for the user
 ifstream file(filename);
-string line;
-cout << "\n--- All Transactions ---\n";
-while (getline(file, line)) {
+string  lines;
+ cout <<"\n--- All Transactions ---\n";
+while (gwhileetline(file, line)) {
 cout << line << endl;
 }
 file.close();
 }
-int main() {
+int main() { // founction that for hadles login and menu navigation.
 int authChoice;
 string username;
 cout << "Welcome to Final Bank System\n";
@@ -118,7 +118,7 @@ else {
 cout << "Invalid deposit amount.\n";
 }
 break;
-case 3:
+case 3: // withdrawal
 cout << "Enter withdrawal amount: $";
 cin >> amount;
 if (amount > 0 && amount <= balance) {
@@ -130,15 +130,15 @@ else {
 cout << "Invalid withdrawal amount.\n";
 }
 break;
-case 4:
+case 4: // show transactions
 showAllTransactions(filename);
 break;
-case 5:
+case 5: // for exit
 cout << "Exiting program. Final balance: $" << balance << endl;
 break;
 default:
 cout << "Invalid option.\n";
 }
-} while (choice != 5);
+} while (choice != 5); // loop until user chose number 5
     return 0;
 }
